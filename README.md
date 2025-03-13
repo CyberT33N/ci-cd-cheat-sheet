@@ -12,20 +12,31 @@ For efficient and guided creation of branches and commits in the terminal, pleas
 <br><br>
 <br><br>
 
-## Git Tools for Guided Branch and Commit Creation
+## Guided Branch and Commit Creation
 
 <br><br>
 
 
 ### Commit Convention
 
+<details><summary>Click to expand..</summary>
+
 We follow the Angular Commit Convention. This convention ensures a consistent and traceable structure for our commit messages. More information can be found here: [Conventional Commits](https://www.conventionalcommits.org/).
 
 Our `git-tools` already includes the implementation of this convention to ensure that all commits adhere to the standards.
 
+
+</details>
+
+
+
+
+
+
+
 ### Branching Strategy and Deployment Process
 
-[Branching Strategy Documentation](https://privadent.atlassian.net/wiki/spaces/SOFTWAREEN/pages/655374)
+<details><summary>Click to expand..</summary>
 
 ---
 
@@ -184,6 +195,7 @@ No commit convention required.
 **Merge:**  
 When development is complete, the feature-dev branch is squash merged into the corresponding feature branch.
 
+
 ---
 
 ## QA Checks and Testing
@@ -228,3 +240,6 @@ Manual QA checks are essential to ensure a high-quality user experience and to t
 
 - **Exploratory Testing:**  
   Test without predefined test cases to uncover unforeseen bugs and validate the application under various conditions.
+
+
+</details>
