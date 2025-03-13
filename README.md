@@ -377,6 +377,13 @@ Our `git-tools` already includes the implementation of this convention to ensure
 
 This documentation describes the branching strategy and deployment process for our project. We use the `main`, `develop`, `Feature-Branches`, and `Feature-Dev-Branches`. This structure ensures that stable and tested code is deployed to production.
 
+
+
+
+
+
+
+
 ### Branches and Their Usage
 
 #### 🛠 Hotfix Branches
