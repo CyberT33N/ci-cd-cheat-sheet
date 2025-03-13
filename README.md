@@ -56,6 +56,55 @@ For efficient and guided creation of branches and commits in the terminal, pleas
 
 
 
+<br><br>
+________
+________
+<br><br>
+
+
+
+# Pipelines
+
+
+
+<details><summary>Click to expand..</summary>
+
+![Pipelines](./pipelines.png)
+  
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
