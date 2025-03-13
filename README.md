@@ -379,7 +379,7 @@ This documentation describes the branching strategy and deployment process for o
 
 
 
-
+![Branching Stzrategy](./branching.png)
 
 
 
