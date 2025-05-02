@@ -351,8 +351,56 @@ Erstelle den Merge Request im GitLab:
 **Feature-Branch** → **Develop-Branch**
 
 
+<br><br>
 
-# 🔄 PR-Workflow mit gesquashten Review-Fixes
+
+### Änderungen auf dem develop Branch seit Erstellung des PR
+
+<details><summary>Click to expand..</summary>
+
+```shell
+git checkout develop
+git pull
+
+git checkout feat/PRIV-10/create-evident-abb-v2/main
+git rebase develop
+
+# ----- Konflikte lösen ----
+# Wenn es Merge-Konflikte gibt und du diese löst, benutze:
+
+# Bei Konflikten mit der package-lock.json:
+# rm -f package-lock.json
+# npm i
+
+# git add .
+# git rebase --continue
+
+# --------------------------
+
+# Wenn nach dem Wechseln der Branches untracked Files übrig bleiben:
+git clean -f -d -x -i -e node_modules
+
+# Stelle sicher, dass die Unit-Tests und Integrationstests lokal wieder erfolgreich sind.
+```
+
+Dann force push:
+```
+git push --force
+```
+  
+</details>
+
+
+
+
+
+<br><br>
+
+
+
+
+
+### 🔄 PR-Workflow mit gesquashten Review-Fixes
 - Dieser Guide beschreibt den Workflow, wie du nach einem Review gezielt Änderungen in einem sauberen Commit auf deinen bestehenden **Pull Request Feature Branch** bringst – ohne die Commit-History zu vermüllen und ohne eure Squash-Konvention zu brechen.
 
 <details><summary>Click to expand..</summary>
