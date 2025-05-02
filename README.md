@@ -204,6 +204,15 @@ git add . && git commit --amend --reuse-message HEAD && git push -f
 </details>
 
 
+
+
+
+
+
+
+<br><br>
+
+
 Falls du mehrere Commits im Feature-Branch hast, kannst du sie zurücksetzen:
 
 <details><summary>Click to expand..</summary>
@@ -266,6 +275,13 @@ git push -f
 ```
 
 </details>
+
+
+
+
+
+
+
 
 ---
 
@@ -333,6 +349,92 @@ Warte, bis die GitLab-Pipeline abgeschlossen ist.
 ## 11. Merge Request (MR) erstellen ➡️
 Erstelle den Merge Request im GitLab:  
 **Feature-Branch** → **Develop-Branch**
+
+
+
+# 🔄 PR-Workflow mit gesquashten Review-Fixes
+- Dieser Guide beschreibt den Workflow, wie du nach einem Review gezielt Änderungen in einem sauberen Commit auf deinen bestehenden **Pull Request Feature Branch** bringst – ohne die Commit-History zu vermüllen und ohne eure Squash-Konvention zu brechen.
+
+<details><summary>Click to expand..</summary>
+
+
+## 🧠 Ziel
+- **Review-Fixes** iterativ auf eigenem Branch durchführen.
+- Alle Fixes **squashen zu einem sauberen Commit**.
+- Den Commit als **zweiten Commit** auf den ursprünglichen PR-Branch bringen.
+- Kein Force-Push notwendig. PR bleibt offen und sauber.
+
+---
+
+## 🔧 Ausgangssituation
+
+| Branch                                  | Zweck                        |
+|----------------------------------------|------------------------------|
+| `feat/PRIV-10/create-evident-abb-v2/main`         | Ursprünglicher PR-Branch     |
+| `feat/PRIV-10/create-evident-abb-v2-pr-changes/dde` | Neuer Dev-Branch für Fixes   |
+
+---
+
+## ✅ Step-by-Step Guide
+
+### 1. Wechsle auf deinen Review-Fix-Branch
+```bash
+git checkout feat/PRIV-10/create-evident-abb-v2-pr-changes/dde
+```
+
+### 2. Squashe alle Commits zu einem einzelnen Fix-Commit
+```bash
+git reset --soft origin/feat/PRIV-10/create-evident-abb-v2/main
+git commit -m "fix(PRIV-10): Review-Fixes & Ergänzungen nach Feedback"
+```
+
+> 🧠 **Erklärung:**  
+> Du befindest dich hier **auf dem Fix-Branch**, der 10–20 Commits enthalten kann.  
+> `git reset --soft` setzt deinen HEAD auf den Stand des PR-Branches – aber **behält alle Änderungen gestaged**.  
+> Dann erzeugst du **einen neuen, einzigen Commit**, der alle Fixes zusammenfasst.  
+> Ergebnis: ein sauberer, gesquashter Fix-Commit auf dem Fix-Branch.
+
+### 3. Wechsle zurück auf den PR-Branch
+```bash
+git checkout feat/PRIV-10/create-evident-abb-v2/main
+```
+
+### 4. Mergest den neuen Commit rein – ohne Squash oder Fast-Forward
+```bash
+git merge --no-ff feat/PRIV-10/create-evident-abb-v2-pr-changes/dde -m "chore(PRIV-10): Merge Review-Fixes from dde branch"
+```
+
+> 🔍 Alternativ: Wenn du den Commit einfach nur übernehmen willst:
+> ```bash
+> git cherry-pick feat/PRIV-10/create-evident-abb-v2-pr-changes/dde
+> ```
+
+### 5. Push zurück zum Remote-PR-Branch
+```bash
+git push origin feat/PRIV-10/create-evident-abb-v2/main
+```
+
+---
+
+## 🧼 Ergebnis
+
+- Dein ursprünglicher PR-Branch enthält:
+  1. ✅ Den ersten Commit aus der ursprünglichen Arbeit
+  2. 🧼 Einen sauberen Fix-Commit mit allen Änderungen aus dem Review
+
+- Die Review-Historie bleibt nachvollziehbar.
+- Kein Force-Push nötig.
+- Git-Log bleibt klar und durchdacht.
+- Reviewer sieht: Was war, was wurde gefixt.
+
+  
+</details>
+
+
+
+
+
+
 
 ---
 
