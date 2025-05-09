@@ -305,6 +305,22 @@ git rebase develop
 # git add .
 # git rebase --continue
 
+
+
+### If you get this error when try to git rebase --continue
+### hint: Waiting for your editor to close the file... C:\Users\denni\AppData\Local\Programs\cursor\Cursor.exe: line 1: C:UsersdenniAppDataLocalProgramscursorCursor.exe: command not found
+### error: there was a problem with the editor 'C:\Users\denni\AppData\Local\Programs\cursor\Cursor.exe'
+### Please supply the message using either -m or -F option.
+
+### Option 1 - Use different terminal window
+
+### Option 2 - To get unblocked immediately and continue your rebase, you can tell Git to use a different editor (like Notepad) for this specific operation. In your PowerShell terminal, run:
+### ```
+### git -c core.editor=notepad rebase --continue
+### ```
+
+
+
 # --------------------------
 
 # Wenn nach dem Wechseln der Branches untracked Files übrig bleiben:
@@ -374,6 +390,21 @@ git rebase develop
 
 # git add .
 # git rebase --continue
+
+
+### If you get this error when try to git rebase --continue
+### hint: Waiting for your editor to close the file... C:\Users\denni\AppData\Local\Programs\cursor\Cursor.exe: line 1: C:UsersdenniAppDataLocalProgramscursorCursor.exe: command not found
+### error: there was a problem with the editor 'C:\Users\denni\AppData\Local\Programs\cursor\Cursor.exe'
+### Please supply the message using either -m or -F option.
+
+### Option 1 - Use different terminal window
+
+### Option 2 - To get unblocked immediately and continue your rebase, you can tell Git to use a different editor (like Notepad) for this specific operation. In your PowerShell terminal, run:
+### ```
+### git -c core.editor=notepad rebase --continue
+### ```
+
+
 
 # --------------------------
 
