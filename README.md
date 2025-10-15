@@ -163,6 +163,61 @@ git merge develop
 * Die Merge-Historie auf deinem Feature-Branch spielt keine Rolle, **der PR wird sauber auf einen Commit reduziert**.
 
 
+## 🔹 Schritt 1: Konflikte lösen
+
+1. Öffne alle Dateien mit Konflikten.
+2. Entscheide, welche Änderungen übernommen werden (Feature oder Develop oder Mix).
+3. Entferne die Git-Marker (`<<<<<<<`, `=======`, `>>>>>>>`).
+
+---
+
+## 🔹 Schritt 2: Änderungen stagen (**MUSS**)
+
+```bash
+git add .
+```
+
+* Das markiert alle Konflikte als **gelöst**.
+* Ohne `git add` weiß Git nicht, dass du die Konflikte gelöst hast.
+
+---
+
+## 🔹 Schritt 3: Merge abschließen (**MUSS**)
+
+```bash
+git commit
+
+# cursor if there are problems
+# git -c core.editor=notepad commit
+```
+
+* Git öffnet standardmäßig den Merge-Commit-Editor.
+* Du kannst die vorgeschlagene Nachricht übernehmen, z. B. `Merge branch 'develop' into feat/...`.
+* Das erzeugt **einen Merge-Commit**, der alle Änderungen von Develop integriert.
+
+---
+
+## 🔹 Optional / empfohlen
+
+* Prüfe, dass alles kompiliert / getestet ist:
+
+```bash
+npm ci
+npm test   # oder test:all
+```
+
+* Dann kannst du deinen Feature-Branch pushen:
+
+```bash
+git push --set-upstream origin feat/PRIV-001/add-new-button/main
+```
+
+* **Squash-Merge später auf PR:**
+
+  * Dein Feature-Branch enthält jetzt Merge-Commit + deine Änderungen.
+  * Wenn du PR machst, wähle **Squash-Merge**, dann wird die gesamte Historie auf **einen Commit** reduziert → sauber in Develop.
+
+
 </details>
 
 
