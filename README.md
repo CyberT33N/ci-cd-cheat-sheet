@@ -117,6 +117,77 @@ ________
 
 # Workflows
 
+## Rebases
+
+### Develop -> Feature-dev Branch
+
+<details><summary>Click to expand..</summary>
+
+- Man **MUSS** auf jeden Fall hier kein Rebase vom Developbranch durchführen, weil wenn man auf seinem Feature-Devbranch hunderte von Comets hat, dann **MUSS** jeder einzelne Comet, den man hat, rebased werden mit dem Developbranch.
+
+
+## 🔹 Dein Problem
+
+* Dein Feature-Branch hat viele Commits (156).
+* Develop hat zwischenzeitlich 21 Commits bekommen.
+* Rebase auf Develop → Git will **alle 156 Commits einzeln auf die neue Basis spielen** → dauert ewig, viele Konflikte.
+* Dein Ziel: Datei gelöscht behalten, PR sauber machen, später Squash-Merge.
+
+---
+
+## 🔹 Deine Alternativen
+
+### 1️⃣ Rebase wie bisher
+
+* **Vorteil:** Commit-Historie bleibt linear.
+* **Nachteil:** Lange, mühsam, viele Konflikte bei langen Branches.
+* **Fazit:** Sinnvoll, wenn du saubere Linearität willst, aber bei 156 Commits auf 21 neue sehr zäh.
+
+---
+
+### 2️⃣ Merge Develop in Feature-Branch
+
+```bash
+git checkout feat/PRIV-001/add-new-button/main
+git merge develop
+```
+- `develop` ist incoming und `feat/PRIV-001/add-new-button/main` is current
+
+* Git erstellt **einen Merge-Commit** statt jeden Commit neu zu spielen.
+* Konflikte müssen trotzdem gelöst werden, **aber nur einmal pro Datei**, nicht für jeden Commit.
+* Danach: Pushen, Squash-Merge auf Feature-Branch → PR → Develop: nur **ein Commit**.
+
+**Wichtig:**
+
+* Für den PR später ist es egal, ob du vorher einen Merge statt Rebase gemacht hast, **weil du sowieso einen Squash-Merge machst**.
+* Die Merge-Historie auf deinem Feature-Branch spielt keine Rolle, **der PR wird sauber auf einen Commit reduziert**.
+
+
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br>
+
+--- 
+
+<br><br>
+
+
+
+
+
+
 
 ## Ticket > Merge Request (MR) Prozess
 
