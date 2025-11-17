@@ -145,13 +145,13 @@ ________
 
 ---
 
-### 2️⃣ Merge Develop in Feature-Branch
+### 2️⃣ Merge Develop in Feature-dev-Branch
 
 ```bash
-git checkout feat/PRIV-001/add-new-button/main
+git checkout feat/PRIV-001/add-new-button/dde
 git merge develop
 ```
-- `develop` ist incoming und `feat/PRIV-001/add-new-button/main` is current
+- `develop` ist incoming und `feat/PRIV-001/add-new-button/dde` is current
 
 * Git erstellt **einen Merge-Commit** statt jeden Commit neu zu spielen.
 * Konflikte müssen trotzdem gelöst werden, **aber nur einmal pro Datei**, nicht für jeden Commit.
