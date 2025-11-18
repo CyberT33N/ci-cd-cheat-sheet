@@ -345,6 +345,10 @@ git commit -m "fix(PRIV-10): Review-Fixes & Ergänzungen nach Feedback"
 > Dann erzeugst du **einen neuen, einzigen Commit**, der alle Fixes zusammenfasst.  
 > Ergebnis: ein sauberer, gesquashter Fix-Commit auf dem Fix-Branch.
 
+- Normalerweise wird es hier **NIEMALS** Probleme geben. Es gibt aber **Edgecase-Szenarien**, wenn man zum Beispiel von einem **Pull-Request-Branch** abzweigen **MUSS**, weil dieser noch nicht angenommen werden kann, um weiterzuarbeiten. Und dann Später wird dieser **Branch** modifiziert durch einen **Amend-Push** zum Beispiel. In diesem Szenario **MUSST** du folgendem **Dokument** folgen:
+  - docs\workflows\git\troubleshooting\merges\squash-merges\feature-dev-into-feature-branch.md
+
+
 ### 3. Wechsle zurück auf den PR-Branch
 ```bash
 git checkout feat/PRIV-10/create-evident-abb-v2/main
