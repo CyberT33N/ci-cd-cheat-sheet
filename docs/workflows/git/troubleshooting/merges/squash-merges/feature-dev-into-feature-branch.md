@@ -201,82 +201,145 @@ Wenn du in dieser Situation landest (wie in deinem aktuellen Ticket), gibt es zw
 <br><br>
 
 
-### Option b) Force add incoming
+### Option b) Force add incoming (PowerShell, mit Altlasten-Bereinigung & Force-Push)
 - In Fällen, wo man explizit weiß, welche Ordner oder Dateien nur relevant sind für die **Merge-Konflikte**, können alle anderen einfach akzeptiert und **editiert** werden.
 
 
 <details><summary>Click to expand..</summary>
 
-- Bei deinem `git merge --squash feat/.../dde` gilt:
+
+- **Use-Case**: Du weißt, dass dein **Feature‑Dev‑Branch** (`dde`) fachlich der Wahrheit entspricht und du nur in einem klar abgegrenzten Ordner (z.B. `src/http`) manuell mergen willst.
+- Annahme: Du befindest dich auf dem **Feature‑Main‑Branch** und hast bereits:
+
+```bash
+git merge --squash refactor/PRIV-143/refactor-dbf-file-lib/dde
+```
+
+- Für diesen Squash gilt:
   - **ours** = aktueller Branch (`.../main`, PR‑Stand),
   - **theirs** = Feature‑Dev‑Branch (`.../dde`).
-- Du willst: **für alle Konfliktdateien außer `src/http/**` → `theirs` akzeptieren**,  
-  und **`src/http/**` erstmal offen lassen** (später manuell mergen).
 
 ---
 
-### 1. Nur Konfliktdateien außerhalb von `src/http` automatisch auf `theirs` setzen
-
-#### Variante A – PowerShell (deine Umgebung)
-
-Im Root des Repos:
+### PowerShell-Skript: „Alles von Dev, außer `src/http` – inklusive Löschungen“
 
 ```powershell
-# 1) Liste aller ungemergten Dateien holen
-$conflicts = git diff --name-only --diff-filter=U
+param(
+    # Name deines Feature-Dev-Branches (theirs)
+    [string]$DevBranch = "refactor/PRIV-143/refactor-dbf-file-lib/dde",
+    # HTTP-Root, das NICHT automatisch übernommen werden soll
+    [string]$HttpRoot = "src/http"
+)
 
-# 2) Alle Konfliktdateien außer src/http/** auswählen
-$toAcceptTheirs = $conflicts | Where-Object { -not $_.StartsWith('src/http/') }
+Write-Host "🔧 Using Dev branch (theirs): $DevBranch"
+Write-Host "🔧 HTTP root excluded from auto-merge: $HttpRoot"
+Write-Host ""
 
-# 3) Für diese Dateien jeweils "theirs" in die Working Copy schreiben und als gelöst markieren
+# 0) Stale index.lock aufräumen (falls vorheriger Git-Prozess abgestürzt ist)
+if (Test-Path ".git\index.lock") {
+    Write-Host "⚠️  Removing stale .git/index.lock"
+    Remove-Item ".git\index.lock" -Force
+}
+
+# 1) Alle ungemergten Blobs (Stages) holen
+# Format: <mode> <object> <stage>\t<path>
+$unmerged = git ls-files -u
+
+if (-not $unmerged) {
+    Write-Host "✅ No unmerged paths found. Nothing to do."
+    git status
+    exit 0
+}
+
+# 2) Alle Dateien ermitteln, die eine 'theirs'-Version (Stage 3) haben
+$theirsFiles = $unmerged |
+    ForEach-Object {
+        $parts = $_ -split '\s+'
+        # parts[2] = Stage (1,2,3), parts[3] = Pfad
+        if ($parts[2] -eq '3') { $parts[3] }
+    } |
+    Sort-Object -Unique
+
+# 3) Für alle diese Dateien außerhalb von HTTP: "theirs" übernehmen (Dev-Branch)
+$toAcceptTheirs = $theirsFiles | Where-Object { -not $_.StartsWith($HttpRoot) }
+
+Write-Host "📂 Accepting 'theirs' (DevBranch) for files outside $HttpRoot..."
 foreach ($f in $toAcceptTheirs) {
+    Write-Host "  → theirs: $f"
     git checkout --theirs -- $f
     git add $f
 }
+
+# 4) Verbleibende unmerged paths prüfen (typische Fälle: both deleted etc.)
+$remainingUnmerged = git diff --name-only --diff-filter=U
+
+if ($remainingUnmerged) {
+    Write-Host ""
+    Write-Host "📂 Handling remaining unmerged paths outside $HttpRoot (typisch: both deleted / Altlasten)..."
+    $toDelete = $remainingUnmerged | Where-Object { -not $_.StartsWith($HttpRoot) }
+
+    foreach ($f in $toDelete) {
+        Write-Host "  → removing (rm): $f"
+        git rm -- $f
+    }
+}
+
+# 5) Altlasten entfernen: Dateien, die NUR im aktuellen Branch existieren (nicht im Dev-Branch),
+#    sollen außerhalb von HTTP gelöscht werden (Baum == Dev, außer HTTP).
+Write-Host ""
+Write-Host "🧹 Removing files that exist only in current branch (Altlasten), compared to $DevBranch..."
+
+# git diff <DevBranch> --name-status:
+# A = Datei nur im aktuellen Branch (Altlast aus main)
+$diff = git diff --name-status $DevBranch --
+
+$extraFiles = $diff |
+    Where-Object { $_ -match '^\s*A\s+' } |
+    ForEach-Object {
+        ($_ -split '\s+')[1]
+    } |
+    Where-Object { -not $_.StartsWith($HttpRoot) }
+
+foreach ($f in $extraFiles) {
+    Write-Host "  → removing extra file: $f"
+    git rm -- $f
+}
+
+Write-Host ""
+Write-Host "✅ Auto-Übernahme abgeschlossen."
+Write-Host "   - Alle Dateien außerhalb '$HttpRoot' sind jetzt auf dem Stand von '$DevBranch' (inkl. Löschungen)."
+Write-Host "   - '$HttpRoot' wurde NICHT angefasst – dort kannst du Konflikte manuell lösen."
+Write-Host ""
+
+git status
+Write-Host ""
+Write-Host "👉 Nächste Schritte:"
+Write-Host "   1. Manuelle Konflikte nur noch unter '$HttpRoot' im Merge-Editor lösen und 'git add' ausführen."
+Write-Host "   2. Squash-Commit erstellen (mkcommit / git commit)."
+Write-Host "   3. Anschließend den Feature-Main-Branch mit 'git push --force' (bzw. '--force-with-lease') zum Remote pushen,"
+Write-Host "      weil der Squash-Merge die Historie des Feature-Branches neu schreibt."
 ```
 
-Ergebnis:
+### Was macht das Skript (kurz)?
 
-- Alle Konfliktdateien **außer** `src/http/**` sind jetzt:
-  - mit dem Inhalt deines **Feature‑Dev‑Branches** (`dde`) im Working Tree,
-  - im Index als „resolved“ (`git status` zeigt sie nicht mehr unter „unmerged paths“).
+- **Schritt 1–3**:  
+  Findet alle Konfliktdateien, die eine `theirs`‑Version haben (Stage 3) und **nicht** unter `src/http/**` liegen, und übernimmt für diese vollständig den Stand des **Feature‑Dev‑Branches** (`git checkout --theirs` + `git add`).
 
-#### Variante B – Git Bash / WSL
+- **Schritt 4**:  
+  Räumt verbleibende Konflikte außerhalb von `src/http` auf, bei denen es typischerweise um gelöschte Altlasten (`both deleted`) geht (`git rm`).
 
-Falls du lieber in einer Bash arbeitest:
+- **Schritt 5**:  
+  Entfernt zusätzlich alle Dateien außerhalb von `src/http`, die **nur im aktuellen Branch** existieren (Altlasten, die im Dev‑Branch schon nicht mehr da sind), sodass der Baum außerhalb von `src/http` wirklich **1:1 dem Dev‑Branch entspricht**.
 
-```bash
-git diff --name-only --diff-filter=U \
-  | grep -v '^src/http/' \
-  | while read -r f; do
-      git checkout --theirs -- "$f"
-      git add "$f"
-    done
-```
+- **Danach**:
+  - Manuell nur noch `src/http/**` mergen.
+  - Squash‑Commit erstellen.
+  - **Wichtig**: Da du mit Squash und dieser Bereinigung die Historie des Feature‑Main‑Branches geändert hast, **MUSS** der Push zum Remote mit `--force` (oder besser `--force-with-lease`) erfolgen:
 
----
+    ```bash
+    git push --force --set-upstream origin refactor/PRIV-143/refactor-dbf-file-lib/main
+    ```
 
-### 2. Was ist danach noch zu tun?
-
-- `git status` wird jetzt nur noch **Konflikte unter `src/http/**`** anzeigen.
-- Genau diese Dateien kannst du dann gezielt im VS‑Code‑Merge‑Editor öffnen und sauber mergen (Current vs. Incoming).
-- Wenn **keine „Unmerged paths“** mehr übrig sind:
-
-```bash
-git status  # prüfen
-# dann deinen Squash-Commit erzeugen
-mkcommit    # oder: git commit -m "feat(PRIV-143): ..."
-```
-
----
-
-### 3. Warum das funktioniert
-
-- `git checkout --theirs -- <file>` schreibt die Version deines **Dev‑Branches** (`feat/.../dde`) in die Working Copy, lässt die Version von `main` fallen und entfernt die Konfliktmarker.
-- `git add <file>` sagt Git: „Konflikt ist hier gelöst, nimm diesen Inhalt für den Squash‑Commit.“
-- Durch das Filtern auf `src/http/` steuerst du, **wo** du auto‑übernehmen willst (Dev‑Branch) und **wo** du bewusst manuell mergen willst (HTTP‑Layer).
-
-Damit löst du in einem Rutsch ~230 Dateien und musst nur noch den Bereich anfassen, der dir fachlich wichtig ist (`src/http`).
 </details>
 
 
