@@ -172,7 +172,7 @@ Aus Git-Sicht sind das dann **verschiedene Welten**, die beim Squash wieder zusa
 
 Wenn du in dieser Situation landest (wie in deinem aktuellen Ticket), gibt es zwei Ebenen:
 
-### 4.1 Kurzfristig: Konflikte sauber auflösen
+### Option a) Kurzfristig: Konflikte sauber auflösen
 
 - `git status` ist die Wahrheit:  
   Nur Dateien unter **„Unmerged paths“** blockieren dich.
@@ -183,6 +183,95 @@ Wenn du in dieser Situation landest (wie in deinem aktuellen Ticket), gibt es zw
 - Nicht erschrecken, wenn VS Code viele „Merge Changes“ zeigt:
   - Dateien nur unter „Changes to be committed“ sind **schon automatisch gemerged**.
   - Das Result‑Pane mit „No Changes Accepted“ ist in solchen Fällen nur eine Review‑Hilfe.
+
+
+<br><br>
+<br><br>
+
+
+### Option b) Force add incoming
+- In Fällen, wo man explizit weiß, welche Ordner oder Dateien nur relevant sind für die **Merge-Konflikte**, können alle anderen einfach akzeptiert und **editiert** werden.
+
+
+<details><summary>Click to expand..</summary>
+
+- Bei deinem `git merge --squash feat/.../dde` gilt:
+  - **ours** = aktueller Branch (`.../main`, PR‑Stand),
+  - **theirs** = Feature‑Dev‑Branch (`.../dde`).
+- Du willst: **für alle Konfliktdateien außer `src/http/**` → `theirs` akzeptieren**,  
+  und **`src/http/**` erstmal offen lassen** (später manuell mergen).
+
+---
+
+### 1. Nur Konfliktdateien außerhalb von `src/http` automatisch auf `theirs` setzen
+
+#### Variante A – PowerShell (deine Umgebung)
+
+Im Root des Repos:
+
+```powershell
+# 1) Liste aller ungemergten Dateien holen
+$conflicts = git diff --name-only --diff-filter=U
+
+# 2) Alle Konfliktdateien außer src/http/** auswählen
+$toAcceptTheirs = $conflicts | Where-Object { -not $_.StartsWith('src/http/') }
+
+# 3) Für diese Dateien jeweils "theirs" in die Working Copy schreiben und als gelöst markieren
+foreach ($f in $toAcceptTheirs) {
+    git checkout --theirs -- $f
+    git add $f
+}
+```
+
+Ergebnis:
+
+- Alle Konfliktdateien **außer** `src/http/**` sind jetzt:
+  - mit dem Inhalt deines **Feature‑Dev‑Branches** (`dde`) im Working Tree,
+  - im Index als „resolved“ (`git status` zeigt sie nicht mehr unter „unmerged paths“).
+
+#### Variante B – Git Bash / WSL
+
+Falls du lieber in einer Bash arbeitest:
+
+```bash
+git diff --name-only --diff-filter=U \
+  | grep -v '^src/http/' \
+  | while read -r f; do
+      git checkout --theirs -- "$f"
+      git add "$f"
+    done
+```
+
+---
+
+### 2. Was ist danach noch zu tun?
+
+- `git status` wird jetzt nur noch **Konflikte unter `src/http/**`** anzeigen.
+- Genau diese Dateien kannst du dann gezielt im VS‑Code‑Merge‑Editor öffnen und sauber mergen (Current vs. Incoming).
+- Wenn **keine „Unmerged paths“** mehr übrig sind:
+
+```bash
+git status  # prüfen
+# dann deinen Squash-Commit erzeugen
+mkcommit    # oder: git commit -m "feat(PRIV-143): ..."
+```
+
+---
+
+### 3. Warum das funktioniert
+
+- `git checkout --theirs -- <file>` schreibt die Version deines **Dev‑Branches** (`feat/.../dde`) in die Working Copy, lässt die Version von `main` fallen und entfernt die Konfliktmarker.
+- `git add <file>` sagt Git: „Konflikt ist hier gelöst, nimm diesen Inhalt für den Squash‑Commit.“
+- Durch das Filtern auf `src/http/` steuerst du, **wo** du auto‑übernehmen willst (Dev‑Branch) und **wo** du bewusst manuell mergen willst (HTTP‑Layer).
+
+Damit löst du in einem Rutsch ~230 Dateien und musst nur noch den Bereich anfassen, der dir fachlich wichtig ist (`src/http`).
+</details>
+
+
+
+<br><br>
+<br><br>
+
 
 ### 4.2 Mittelfristig: Wie macht man es „richtig“, wenn man auf PR‑Stand weiterarbeiten MUSS?
 
