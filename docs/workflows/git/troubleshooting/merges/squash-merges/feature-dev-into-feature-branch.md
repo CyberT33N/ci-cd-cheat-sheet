@@ -185,6 +185,18 @@ Wenn du in dieser Situation landest (wie in deinem aktuellen Ticket), gibt es zw
   - Das Result‑Pane mit „No Changes Accepted“ ist in solchen Fällen nur eine Review‑Hilfe.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 <br><br>
 <br><br>
 
@@ -266,6 +278,20 @@ mkcommit    # oder: git commit -m "feat(PRIV-143): ..."
 
 Damit löst du in einem Rutsch ~230 Dateien und musst nur noch den Bereich anfassen, der dir fachlich wichtig ist (`src/http`).
 </details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
