@@ -3,117 +3,201 @@
 <details><summary>Click to expand..</summary>
 
 
+# Richtlinie zur Namenskonvention für Hotfix-Branches
 
-### 1️⃣ Hotfix-Feature-Branch erstellen
+## Branch-Typ
 
-* Ausgangspunkt: **Master**
+- Immer `hotfix` als erster Pfad-Bestandteil  
+- Keine zusätzlichen Typen wie `fix`, `feat`, `refactor` davor oder dahinter
 
+### Allgemeines Muster
+
+**Main-Branch:**
+```
+
+hotfix/<TICKET-ID>/<optional-kurze-beschreibung>/main
+
+```
+
+**Dev-Branch:**
+```
+
+hotfix/<TICKET-ID>/<optional-kurze-beschreibung>/dde
+
+```
+
+**Kurzform ohne Beschreibung:**
+```
+
+hotfix/ABC-999/main
+hotfix/ABC-999/dde
+
+````
+
+### Commit-Typ vs. Branch-Typ
+
+- Branch-Typ bestimmt Workflow (Feature vs. Hotfix, Basis-Branch, Merge-Reihenfolge).  
+- Commit-Typ (fix, feat, refactor, hotfix, …) beschreibt *Art der Änderung* gemäß Conventional Commits.  
+
+**Fazit:**  
+Branch-Typ `hotfix` reicht. Commit-Typ übernimmt die fachliche Einordnung.
+
+---
+
+## 1️⃣ Ticket in Jira anlegen
+
+- Ticket erstellen (z. B. `PRIV-155`)  
+- Status auf *In Progress* setzen  
+- Ticket ggf. in aktuellen Sprint verschieben  
+
+---
+
+## 2️⃣ Hotfix-Branches erstellen
+
+### Ausgangspunkt: master
 ```bash
 git checkout master
 git pull origin master
-git checkout -b hotfix/ABC-999/main
+````
+
+### Hotfix-Main-Branch (Single-Commit-Container)
+
+```bash
+git checkout -b hotfix/PRIV-155/main
 ```
 
-* **Zweck:** sauberer Commit-Container für den späteren Squash.
-* Kein Arbeiten direkt hier, nur Branch als „Single-Commit-Ziel" vorbereiten.
+**Zweck:**
+
+* Enthält später *genau einen* sauberen Squash-Commit
+* Wird in `master` und `develop` gemergt
+* Keine Arbeit direkt hier – keine Experimente
+
+### Hotfix-Dev-Branch erstellen
+
+```bash
+git checkout hotfix/PRIV-155/main
+git checkout -b hotfix/PRIV-155/dde
+```
+
+**Zweck `dde`:**
+
+* Arbeitsbranch
+* Mehrere Commits, Tests, Refactorings möglich
+* Lokale Iteration bis der Hotfix stabil ist
 
 ---
 
-### 2️⃣ Hotfix-Dev-Branch erstellen
+## 3️⃣ Hotfix entwickeln (auf `hotfix/PRIV-155/dde`)
 
-* Basis: **Hotfix-Feature-Branch**
-
-```bash
-git checkout hotfix/ABC-999/main
-git checkout -b hotfix/ABC-999/dde
-```
-
-* **Zweck:** Spielwiese für mehrere Commits, Tests, Experimente.
-* **Multiple Commits erlaubt** → lokale Iterationen, Refactoring, Tests.
-
----
-
-### 3️⃣ Hotfix entwickeln
-
-* Bearbeitung auf `hotfix/ABC-999/dde`
-* Lokale Tests laufen lassen:
+### Auf Branch wechseln
 
 ```bash
-npm ci
-npm test
+git checkout hotfix/PRIV-155/dde
+pnpm install
 ```
 
-* Mehrere Commits wie üblich:
+### Problem lösen
 
 ```bash
 git add .
-git commit -m "fix(ABC-999): bugfix step 1"
-git commit -m "fix(ABC-999): bugfix step 2"
+# git commit -m "fix(PRIV-155): bugfix step 1"
+# git commit -m "fix(PRIV-155): bugfix step 2"
+# git commit -m "hotfix(PRIV-155): critical bugfix payment processing"
+mkcommit
 ```
 
----
-
-### 4️⃣ Squash Merge in Hotfix-Feature-Branch
-
-* Wechsel zum Feature-Branch:
+### Tests ausführen
 
 ```bash
-git checkout hotfix/ABC-999/main
-git merge --squash hotfix/ABC-999/dde
-git commit -m "hotfix(ABC-999): critical bugfix payment processing"
+pnpm run test
 ```
 
-* Ergebnis: **ein sauberer Commit** im Feature-Branch.
+### Version bump (falls kein automatisches Release-Build vorhanden)
 
----
+* package.json manuell erhöhen
 
-### 5️⃣ Merge Hotfix in Master
+### Pushen
 
 ```bash
-git checkout master
-git merge --no-ff hotfix/ABC-999/main
-git push origin master
+git push --set-upstream origin hotfix/PRIV-155/dde
 ```
-
-* CI/CD baut den Hotfix und deployed in Produktion.
 
 ---
 
-### 6️⃣ Merge Hotfix in Develop
+## 4️⃣ Squash-Merge in den Hotfix-Main-Branch
 
-* Develop up-to-date halten:
+### Wechseln & Squashen
 
 ```bash
-git checkout develop
-git pull origin develop
-git merge --no-ff hotfix/ABC-999/main
-git push origin develop
+git checkout hotfix/PRIV-155/main
+git merge --squash hotfix/PRIV-155/dde
+git commit -m "hotfix(PRIV-155): critical bugfix payment processing"
+git push --set-upstream origin hotfix/PRIV-155/main
 ```
 
-* Konflikte lösen falls nötig
-* Tests erneut ausführen.
+**Ergebnis:**
+Ein einziger sauberer Commit im Branch `hotfix/ABC-999/main`.
 
 ---
 
-### 7️⃣ Branch Cleanup (optional)
+## 5️⃣ Merge Hotfix in `master` (Produktion)
 
-```bash
-git branch -d hotfix/ABC-999/dde
-git branch -d hotfix/ABC-999/main
-git push origin --delete hotfix/ABC-999/dde
-git push origin --delete hotfix/ABC-999/main
-```
-
-* Branches existieren nur temporär, um CI/CD und Historie sauber zu halten.
+* PR erstellen:
+  `hotfix/PRIV-155/main → master`
+* **Wichtig:** Hotfix-Branch nicht löschen – wird noch für develop benötigt
 
 ---
 
-### ✅ Prinzipien
+## 6️⃣ Merge Hotfix in `develop`
 
-1. **Feature-Branch zuerst**, Dev-Branch danach → sauberer Squash möglich
-2. **Multiple Commits nur im Dev-Branch** → Master bleibt sauber
-3. **Master = stabile Basis**, Develop bekommt Hotfix **nach Master**
-4. **CI/CD-Checks für Hotfix verpflichtend** → Qualitätssicherung
+* PR erstellen:
+  `hotfix/PRIV-155/main → develop`
+* Kann eigenständig gemergt werden
+
+---
+
+## Hinweis zu Hotfix-PRs auf develop
+
+Mehrere Commits im Hotfix-PR auf develop deuten oft darauf hin, dass master & develop nicht vollständig synchron waren
+(z. B. Release-PR develop → master, aber kein Rück-PR master → develop).
+
+**Technisch unkritisch**, solange nur die tatsächlichen Hotfix-Änderungen im Diff enthalten sind.
+
+Der Merge stellt gleichzeitig sicher, dass develop wieder historisch mit master gleichzieht.
+
+---
+
+# Grundprinzipien
+
+## Naming
+
+```
+hotfix/<JIRA-TICKET>/<optional-beschreibung>/main
+hotfix/<JIRA-TICKET>/<optional-beschreibung>/dde
+```
+
+Keine Prefixes wie `fix/`, `feat/`, `refactor/` bei Hotfix-Branches.
+
+## Main vs. Dev
+
+* **main:**
+
+  * exakt **ein Squash-Commit**
+  * Basis für Merge in master & develop
+
+* **dde:**
+
+  * mehrere Commits erlaubt
+  * Arbeits- und Experimentierbranch
+
+## Qualität
+
+* Hotfix wird behandelt wie ein normales Feature
+* Tests, CI/CD, Reviews, Merges sind Pflicht
+* `master` bleibt stabil
+* `develop` wird immer nachgezogen
+
+
 
 
 
