@@ -19,7 +19,8 @@ The documentation has been modularized into **6** separate files organized in **
 ### 📋 Workflows
 
 #### Rebases
-- [Develop to Feature-Dev Branch](./docs/workflows/rebases/develop-to-feature-dev.md) - Rebase vs merge strategies and conflict resolution
+- [Develop to Feature-Dev Branch](https://github.com/CyberT33N/ci-cd-cheat-sheet/blob/main/docs/workflows/git/troubleshooting/merges/squash-merges/feature-dev-into-feature-branch.md) - Rebase vs merge strategies and conflict resolution
+
 
 #### Merge Request Process
 - [Ticket to MR Process](./docs/workflows/merge-request/ticket-to-mr-process.md) - Complete 12-step workflow from Jira to deployment (includes PR changes handling and squashed review fixes)
