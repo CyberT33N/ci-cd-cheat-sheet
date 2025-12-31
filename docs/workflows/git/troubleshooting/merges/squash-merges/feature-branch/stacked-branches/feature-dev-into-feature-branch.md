@@ -73,6 +73,20 @@ Solange du:
 
 ist ein `git merge --squash` vom Dev‑Branch zurück auf den Feature‑Main‑Branch **architektonisch sauber** und praktisch **im Normalfall konfliktarm/-frei**.
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
 ## 2. Arbeiten auf Basis eines PR‑Feature‑Branches (Stacked Branches)
@@ -101,6 +115,16 @@ Das ist **kein Anti‑Pattern**, aber es ist **ein fortgeschrittener Workflow**,
 
 - der Parent‑Branch (`feat/PRIV-100/...`) **nachträglich nicht mehr per Rebase/Amend verändert** wird, oder
 - du alle Child‑Branches danach **sofort darauf rebasest**.
+
+
+
+
+
+
+
+
+
+
 
 ---
 
