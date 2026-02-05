@@ -1,4 +1,4 @@
----
+
 
 ### Architekturell “richtige” Reihenfolge (Develop → Master nach langer Zeit)
 **Master bleibt “Release‑Source‑of‑Truth”.** Deshalb ist die robuste Reihenfolge:
