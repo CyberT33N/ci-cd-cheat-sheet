@@ -62,6 +62,20 @@ git merge origin/develop
 
 - **Mit Konflikten**: Konflikte lösen und dann den Merge abschließen:
 
+Wenn bei dir **incoming = `develop`** ist und du für z.b. **`.swarm/memory.db`** die `develop`-Version übernehmen willst:
+
+```bash
+git checkout --theirs -- .swarm/memory.db
+git add .swarm/memory.db
+```
+
+Falls du stattdessen **deine** Version behalten willst:
+
+```bash
+git checkout --ours -- .swarm/memory.db
+git add .swarm/memory.db
+```
+
 ```bash
 # Bei Konflikten mit der package-lock.json:
 # Remove-Item -Path "pnpm-lock.yaml" -Force
