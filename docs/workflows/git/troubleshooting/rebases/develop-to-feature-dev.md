@@ -1,5 +1,9 @@
 # Develop -> Feature-dev Branch
 
+> ⚠️ **Nicht Standard-Workflow:** Dieses Dokument ist ein **Troubleshooting-Guide** für den Fall, dass ein **Rebase** von `develop` in einen (sehr) langen Feature-Dev-Branch zu viel Aufwand / zu viele Konflikte erzeugt.
+>
+> ✅ **Standard-Fall (Develop → Feature-Dev):** Wenn du einfach nur den aktuellen Stand vom **Develop-Branch** in deinem **Feature-Dev-Branch** haben **MUSST**, reicht ein normaler **Merge**. Siehe: [`Develop-Into-Feature-Dev`](../merges/feature-dev-branch/develop-into-feature-dev.md)
+
 <details><summary>Click to expand..</summary>
 
 - Man **MUSS** auf jeden Fall hier kein Rebase vom Developbranch durchführen, weil wenn man auf seinem Feature-Devbranch hunderte von Comets hat, dann **MUSS** jeder einzelne Comet, den man hat, rebased werden mit dem Developbranch.

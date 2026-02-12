@@ -174,7 +174,7 @@ git rebase develop
 # rm -f package-lock.json
 # npm i
 
-# git add .
+# git add pnpm-lock.yaml
 # git rebase --continue
 
 
