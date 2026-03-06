@@ -1,6 +1,5 @@
 # Develop-Into-Feature-Dev
 
-<details><summary>Click to expand..</summary>
 
 ## 🧠 Ziel
 Du willst den **aktuellen Stand von `develop`** in deinen **Feature-Dev-Branch** holen – z. B. um **temporäre Releases/Test-Deployments** zu erstellen.
@@ -43,6 +42,10 @@ git status
 git fetch origin --prune
 ```
 
+
+
+
+
 ### 2) Auf den Feature-Dev-Branch wechseln und lokal fast-forwarden
 
 ```bash
@@ -50,6 +53,10 @@ git checkout <feature-dev-branch>
 
 git merge --ff-only origin/<feature-dev-branch>
 ```
+
+
+
+
 
 ### 3) `develop` in den Feature-Dev-Branch mergen
 
@@ -86,6 +93,42 @@ git add -A
 
 git commit
 ```
+
+
+
+<br><br>
+
+
+
+`git checkout --theirs -- <datei>` funktioniert nur, wenn auf der Merge-Seite `theirs` **eine echte Dateiversion existiert**.
+
+Wurde die Datei im Branch, den du gerade mergst, **gelöscht**, dann gibt es dort **keine `their`-Version** mehr. Deshalb kommt der Fehler:
+
+```text
+does not have their version
+```
+
+Für dein Cheat Sheet:
+- `theirs` vorhanden: `git checkout --theirs -- <datei>`
+- `theirs` = Datei wurde gelöscht: `git rm -- <datei>`
+
+Merksatz:
+Wenn `theirs` die Datei gelöscht hat, kannst du sie nicht auschecken, sondern musst die Löschung übernehmen.
+
+
+
+
+
+
+
+
+
+
+
+<br><br>
+
+<br><br>
+
 
 ### 4) Optional: lokal verifizieren (Build/Tests)
 Beispiele:
@@ -132,4 +175,4 @@ Ein Merge von `develop` in Feature-Dev ist grundsätzlich okay.
 
 Wichtig ist nur: Wenn du später den Feature-Dev-Branch per **`git merge --squash`** in den **Feature-Branch** bringst, sollte der **Feature-Branch** vorher ebenfalls auf einem aktuellen `develop`-Stand sein – sonst könntest du `develop`-Änderungen ungewollt mit in deinen Squash-Commit aufnehmen.
 
-</details>
+
