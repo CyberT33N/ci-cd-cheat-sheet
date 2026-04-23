@@ -89,6 +89,9 @@ git add .swarm/memory.db
 # pnpm i
 # git add pnpm-lock.yaml
 
+# Falls auf dem develop Branch eine Datei gelöscht wurde, also zum Beispiel in Incoming, und man das bestätigen will, kann man das hier machen.
+# git rm -- src\modules\pvs\charly\contracts\CharlyPatient.ts
+
 git add -A
 
 git commit
