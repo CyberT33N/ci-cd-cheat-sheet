@@ -83,19 +83,73 @@ git checkout --ours -- .swarm/memory.db
 git add .swarm/memory.db
 ```
 
+
+
+Falls du oder KI in einer Datei etwas ändern und du sie dann als Quelle für den Merge Konflikt nutzen willst:
+```shell
+git add -- "apps/test/package.json"
+```
+
+
+
+Falls auf dem develop Branch eine Datei gelöscht wurde, also zum Beispiel in Incoming, und man das bestätigen will, kann man das hier machen.
+```shell
+git rm -- src\modules\pvs\charly\contracts\CharlyPatient.ts
+```
+
+
+Bei Konflikten mit der package-lock.json:
+
+
+Method 1 (recommended)
+```shell
+nvm use 26.2.0
+
+pnpm install --lockfile-only
+
+git add pnpm-lock.yaml
+
+git merge --continue
+```
+Warum so und nicht löschen?
+pnpm install --lockfile-only ist hier der sauberste Weg, weil es:
+
+die Lockdatei aus dem jetzt korrekten package.json neu ableitet
+kein unnötiges node_modules-Refresh erzwingt
+
+
+Method 2 (not recommended)
+```shell
+Remove-Item -Path "pnpm-lock.yaml" -Force
+
+pnpm i
+
+git add pnpm-lock.yaml
+```
+
+
+
+
+
+
+
+---
+
+
+Add changes
 ```bash
-# Bei Konflikten mit der package-lock.json:
-# Remove-Item -Path "pnpm-lock.yaml" -Force
-# pnpm i
-# git add pnpm-lock.yaml
-
-# Falls auf dem develop Branch eine Datei gelöscht wurde, also zum Beispiel in Incoming, und man das bestätigen will, kann man das hier machen.
-# git rm -- src\modules\pvs\charly\contracts\CharlyPatient.ts
-
 git add -A
 
 git commit
 ```
+
+
+
+
+
+
+
+
 
 
 
